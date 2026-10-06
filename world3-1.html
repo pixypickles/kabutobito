@@ -392,13 +392,13 @@ function update(){
 function cloud(x,y){g.fillStyle='#fff';g.beginPath();g.arc(x,y,23,0,7);g.arc(x+26,y-12,30,0,7);g.arc(x+58,y,23,0,7);g.fill()}
 
 function drawLoop2VisibleBullets(){
- if(!loop2||typeof loopBullets==='undefined')return;
+ if(!LOOP2||typeof loopBullets==='undefined')return;
  for(let q of loopBullets){
    if(!q||q.dead)continue;
    let sx=q.x-(typeof camX==='number'?camX:0), sy=q.y;
    g.save();
    g.globalAlpha=.28;g.fillStyle='#fff7a8';g.beginPath();g.arc(sx,sy,(q.r||6)+6,0,Math.PI*2);g.fill();
-   g.globalAlpha=1;g.fillStyle=q.reflected?'#9ff7ff':'#ffe24a';g.strokeStyle=q.reflected?'#177fa0':'#6b4a00';g.lineWidth=2.5;
+   g.globalAlpha=1;g.fillStyle=q.ref?'#9ff7ff':'#ffe24a';g.strokeStyle=q.ref?'#177fa0':'#6b4a00';g.lineWidth=2.5;
    g.beginPath();g.arc(sx,sy,q.r||6,0,Math.PI*2);g.fill();g.stroke();
    g.fillStyle='#ffffff';g.beginPath();g.arc(sx-2,sy-2,1.8,0,Math.PI*2);g.fill();
    g.restore();
