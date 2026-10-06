@@ -4,6 +4,6 @@ const STAGES=['world1-1.html','world1-2.html','world1-3.html','world1-4.html','w
 const cleared=localStorage.getItem('maruchibiCleared')==='1'; if(cleared){document.getElementById('loop2').hidden=false;document.getElementById('status').dataset.cleared='1'}
 const cur=localStorage.getItem('maruchibiCurrentStage');document.getElementById('status').textContent=cur?'つづき： '+cur.replace('world','WORLD ').replace('.html',''):'まだ冒険の記録はありません';
 function clearRun(){['maruchibiScore','maruchibiStars','maruchibiBig','maruchibiGlove','maruchibiMisses','maruchibiCurrentStage'].forEach(k=>localStorage.removeItem(k))}
-function newGame(loop2){clearRun();localStorage.setItem('maruchibiLoop2',loop2?'1':'0');if(loop2){localStorage.setItem('maruchibiBlueHorn','1');localStorage.setItem('maruchibiBig','1');localStorage.setItem('maruchibiGlove','1')}location.href='world1-1.html'}
+function newGame(loop2){clearRun();localStorage.setItem('maruchibiLoop2',loop2?'1':'0');if(loop2){localStorage.setItem('maruchibiBlueHorn','1');localStorage.setItem('maruchibiBig','1');localStorage.setItem('maruchibiGlove','0')}location.href='world1-1.html'}
 function continueGame(){let s=localStorage.getItem('maruchibiCurrentStage');location.href=STAGES.includes(s)?s:'world1-1.html'}
 </script></body></html>

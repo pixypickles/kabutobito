@@ -38,7 +38,7 @@ const W=960,H=540,GROUND=480,WORLD=7000;
 const carriedScore=Number(localStorage.getItem('maruchibiScore')||0),carriedStars=Number(localStorage.getItem('maruchibiStars')||0),carriedBig=localStorage.getItem('maruchibiBig')==='1',carriedGlove=localStorage.getItem('maruchibiGlove')==='1';localStorage.removeItem('maruchibiScore');localStorage.removeItem('maruchibiStars');localStorage.removeItem('maruchibiBig');localStorage.removeItem('maruchibiGlove');
 let keys={},cam=0,score=carriedScore,stars=carriedStars,dead=false,won=false,jumpHeld=false,notice='',noticeT=0,frame=0,hornHit=null,hornGuard=null,stageExit=0,winTimer=0;
 const p={x:90,y:GROUND-44,w:38,h:44,vx:0,vy:0,on:false,big:carriedBig,glove:carriedGlove,face:1,crouch:false,inv:0,anim:0,punchT:0,punchCd:0,hornT:0,hornCd:0,attackUp:false,lookUp:false,blueHorn:LOOP2};
-if(LOOP2){p.blueHorn=true;p.big=true;p.glove=true;if(p.h<62){let _f=p.y+p.h;p.h=62;p.y=_f-62;}}
+if(LOOP2){p.blueHorn=true;p.big=true;p.glove=false;if(p.h<62){let _f=p.y+p.h;p.h=62;p.y=_f-62;}}
 
 if(p.big){let f=p.y+p.h;p.h=62;p.y=f-62}
 
@@ -104,6 +104,7 @@ if(LOOP2){
   if(typeof throwers!=='undefined')tougher(throwers,230);
   if(typeof waterShooters!=='undefined')tougher(waterShooters,185);
 }
+let loopBullets=[],loopBursts=[],loopBulletClock=0;
 function R(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
 function groundAt(x,y){
  return grounds.some(q=>x>=q.x&&x<=q.x+q.w&&y>=q.y-3&&y<=q.y+q.h);
@@ -233,6 +234,25 @@ function update(){
    for(let s of snails)if(s.alive&&R(punch,{x:s.x,y:s.y,w:38,h:38})){if(s.shell)kickShell(s,p.face);else{s.shell=1;s.shellV=p.face*10;score+=250}}
  }
  // Horn scoop: lift enemies from the front and fling them behind the player.
+ /* LOOP2 ALL-ENEMY BULLETS */
+ if(LOOP2){
+   loopBulletClock++;
+   if(loopBulletClock%96===0){
+     let pool=[];
+     const add=A=>{if(Array.isArray(A))pool.push(...A)};
+     if(typeof ants!=='undefined')add(ants);if(typeof snails!=='undefined')add(snails);if(typeof grasshoppers!=='undefined')add(grasshoppers);
+     if(typeof frogs!=='undefined')add(frogs);if(typeof throwers!=='undefined')add(throwers);if(typeof waterShooters!=='undefined')add(waterShooters);
+     if(typeof flyers!=='undefined')add(flyers);if(typeof swimmers!=='undefined')add(swimmers);if(typeof enemies!=='undefined')add(enemies);
+     for(let e of pool){if(!e||e.alive===0||e.dead||typeof e.x!=='number')continue;if(Math.random()>.78)continue;let ex=e.x+(e.w||36)/2,ey=e.y+(e.h||38)/2,dx=p.x+p.w/2-ex,dy=p.y+p.h/2-ey,L=Math.hypot(dx,dy)||1;loopBullets.push({x:ex,y:ey,vx:dx/L*2.35,vy:dy/L*2.35,r:5,t:280,ref:0})}
+   }
+   for(let q of loopBullets){q.x+=q.vx;q.y+=q.vy;q.t--;
+     if(p.blueHorn&&hornHit&&R(hornHit,{x:q.x-q.r,y:q.y-q.r,w:q.r*2,h:q.r*2})&&!q.ref){q.ref=1;q.vx*=-1.7;q.vy*=-1.7;q.t=120;loopBursts.push({x:q.x,y:q.y,t:14});score+=20;continue}
+     if(!q.ref&&R(p,{x:q.x-q.r,y:q.y-q.r,w:q.r*2,h:q.r*2})){hurt();q.t=0;loopBursts.push({x:q.x,y:q.y,t:12})}
+     if(q.ref){let hit=false;const zap=A=>{if(!Array.isArray(A)||hit)return;for(let e of A){if(!e||e.alive===0||typeof e.x!=='number')continue;if(R({x:q.x-q.r,y:q.y-q.r,w:q.r*2,h:q.r*2},{x:e.x,y:e.y,w:e.w||40,h:e.h||42})){e.alive=0;hit=true;score+=250;loopBursts.push({x:q.x,y:q.y,t:16});break}}};if(typeof ants!=='undefined')zap(ants);if(typeof snails!=='undefined')zap(snails);if(typeof grasshoppers!=='undefined')zap(grasshoppers);if(typeof frogs!=='undefined')zap(frogs);if(typeof throwers!=='undefined')zap(throwers);if(typeof waterShooters!=='undefined')zap(waterShooters);if(typeof flyers!=='undefined')zap(flyers);if(typeof swimmers!=='undefined')zap(swimmers);if(typeof enemies!=='undefined')zap(enemies);if(hit)q.t=0}
+   }
+   loopBullets=loopBullets.filter(q=>q.t>0&&q.x>-150&&q.x<(typeof WORLD!=='undefined'?WORLD:8000)+150&&q.y>-150&&q.y<750);
+   for(let b of loopBursts)b.t--;loopBursts=loopBursts.filter(b=>b.t>0);
+ }
  if(hornHit){
    /* BLUE HORN TERRAIN BREAK */
    if(p.blueHorn){
@@ -359,7 +379,7 @@ function update(){
  }
 
 
- for(let u of pickups){u.t++;if(u.t<15){u.y+=u.vy;u.vy+=.22}if(R(p,u)){if(u.type==='sap'){p.big=true;if(canStand())setH(62);score+=500}else if(u.type==='bluehorn'){p.blueHorn=true;p.big=true;p.glove=true;if(canStand())setH(62);notice='青角パワー回復！';noticeT=120;score+=800}else if(u.type==='glove'){p.big=true;p.glove=true;if(canStand())setH(62);notice='グローブ！ Bでパンチ';noticeT=130;score+=800}else if(u.type==='leaf'){stars++;score+=300}u.got=1}}
+ for(let u of pickups){u.t++;if(u.t<15){u.y+=u.vy;u.vy+=.22}if(R(p,u)){if(u.type==='sap'){p.big=true;if(canStand())setH(62);score+=500}else if(u.type==='bluehorn'){p.blueHorn=true;p.big=true;p.glove=false;if(canStand())setH(62);notice='青角パワー回復！';noticeT=120;score+=800}else if(u.type==='glove'){p.big=true;p.glove=true;if(canStand())setH(62);notice='グローブ！ Bでパンチ';noticeT=130;score+=800}else if(u.type==='leaf'){stars++;score+=300}u.got=1}}
  pickups=pickups.filter(u=>!u.got);
  for(let l of airLeaves)if(!l.got&&R(p,l)){l.got=1;stars++;score+=200;debris(l.x-12,l.y-12,4)}
  for(let d of particles){d.x+=d.vx;d.y+=d.vy;d.vy+=.35;d.t--}particles=particles.filter(d=>d.t>0);
@@ -371,6 +391,8 @@ function update(){
 
 function cloud(x,y){g.fillStyle='#fff';g.beginPath();g.arc(x,y,23,0,7);g.arc(x+26,y-12,30,0,7);g.arc(x+58,y,23,0,7);g.fill()}
 function draw(){
+ /* DRAW LOOP2 BULLETS */
+ if(LOOP2){for(let q of loopBullets){g.save();g.fillStyle=q.ref?'#bff8ff':'#ffd85a';g.strokeStyle=q.ref?'#4cc9e8':'#6b4a18';g.lineWidth=2;g.beginPath();g.arc(q.x-cam,q.y,q.r,0,Math.PI*2);g.fill();g.stroke();g.restore()}for(let b of loopBursts){let rr=(15-b.t)*1.5+5;g.save();g.globalAlpha=Math.max(0,b.t/16);g.strokeStyle='#d9fbff';g.lineWidth=3;g.beginPath();g.arc(b.x-cam,b.y,rr,0,Math.PI*2);g.stroke();for(let k=0;k<6;k++){let a=k*Math.PI/3;g.beginPath();g.moveTo(b.x-cam+Math.cos(a)*rr,b.y+Math.sin(a)*rr);g.lineTo(b.x-cam+Math.cos(a)*(rr+8),b.y+Math.sin(a)*(rr+8));g.stroke()}g.restore()}}
  g.fillStyle='#142449';g.fillRect(0,0,W,H);
  g.fillStyle='#f5efc8';g.beginPath();g.arc(805,90,38,0,7);g.fill();g.fillStyle='#142449';g.beginPath();g.arc(821,78,36,0,7);g.fill();
  g.fillStyle='#dbe7ff';for(let i=0;i<34;i++){let sx=(i*277-cam*.06)%1100,sy=35+(i*71)%210;g.fillRect(sx,sy,2+(i%3===0),2+(i%3===0))}
