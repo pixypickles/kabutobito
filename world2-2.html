@@ -425,6 +425,20 @@ function update(){
 }
 
 function cloud(x,y){g.fillStyle='#fff';g.beginPath();g.arc(x,y,23,0,7);g.arc(x+26,y-12,30,0,7);g.arc(x+58,y,23,0,7);g.fill()}
+
+function drawLoop2VisibleBullets(){
+ if(!loop2||typeof loopBullets==='undefined')return;
+ for(let q of loopBullets){
+   if(!q||q.dead)continue;
+   let sx=q.x-(typeof camX==='number'?camX:0), sy=q.y;
+   g.save();
+   g.globalAlpha=.28;g.fillStyle='#fff7a8';g.beginPath();g.arc(sx,sy,(q.r||6)+6,0,Math.PI*2);g.fill();
+   g.globalAlpha=1;g.fillStyle=q.reflected?'#9ff7ff':'#ffe24a';g.strokeStyle=q.reflected?'#177fa0':'#6b4a00';g.lineWidth=2.5;
+   g.beginPath();g.arc(sx,sy,q.r||6,0,Math.PI*2);g.fill();g.stroke();
+   g.fillStyle='#ffffff';g.beginPath();g.arc(sx-2,sy-2,1.8,0,Math.PI*2);g.fill();
+   g.restore();
+ }
+}
 function draw(){
  /* DRAW LOOP2 BULLETS */
  if(LOOP2){for(let q of loopBullets){g.save();g.fillStyle=q.ref?'#bff8ff':'#ffd85a';g.strokeStyle=q.ref?'#4cc9e8':'#6b4a18';g.lineWidth=2;g.beginPath();g.arc(q.x-cam,q.y,q.r,0,Math.PI*2);g.fill();g.stroke();g.restore()}for(let b of loopBursts){let rr=(15-b.t)*1.5+5;g.save();g.globalAlpha=Math.max(0,b.t/16);g.strokeStyle='#d9fbff';g.lineWidth=3;g.beginPath();g.arc(b.x-cam,b.y,rr,0,Math.PI*2);g.stroke();for(let k=0;k<6;k++){let a=k*Math.PI/3;g.beginPath();g.moveTo(b.x-cam+Math.cos(a)*rr,b.y+Math.sin(a)*rr);g.lineTo(b.x-cam+Math.cos(a)*(rr+8),b.y+Math.sin(a)*(rr+8));g.stroke()}g.restore()}}
@@ -672,6 +686,8 @@ g.strokeStyle='#285f88';g.lineWidth=2.2;g.beginPath();g.moveTo(-12,1);g.lineTo(-
  if(noticeT){g.fillStyle='#0009';g.fillRect(260,75,440,42);g.fillStyle='#fff';g.font='bold 20px sans-serif';g.fillText(notice,340,103)}
  if(dead){g.fillStyle='#0009';g.fillRect(0,0,W,H);g.fillStyle='#fff';g.font='bold 42px sans-serif';g.fillText('しょんぼり…',350,270)}
  if(won){g.fillStyle='#0009';g.fillRect(0,0,W,H);g.fillStyle='#fff';g.font='bold 44px sans-serif';g.fillText('やったー！',365,235);g.font='25px sans-serif';g.fillText('ゴール！ SCORE '+score,330,285)}
+
+/*VISIBLE_LOOP2_BULLETS*/drawLoop2VisibleBullets();
 }
 function loop(){update();draw();requestAnimationFrame(loop)}loop();
 </script>
