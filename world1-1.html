@@ -73,7 +73,7 @@ let airLeaves=[{x:920,y:350},{x:1010,y:310},{x:1100,y:350},{x:1730,y:330},{x:181
 
 /* LOOP2 ENHANCER */
 if(LOOP2){
-  for(let b of blocks)if(b.type==='glove')b.type='bluehorn';
+  
   const tougher=(arr,dx)=>{if(!Array.isArray(arr)||!arr.length)return;let add=[];for(let i=0;i<arr.length;i+=2){let e=arr[i];if(!e||typeof e.x!=='number')continue;let n={...e,x:e.x+dx,alive:1};if('cd' in n)n.cd=Math.max(22,(n.cd||60)-12);if('safeT' in n)n.safeT=0;add.push(n)}arr.push(...add)};
   if(typeof grasshoppers!=='undefined')tougher(grasshoppers,150);
   if(typeof snails!=='undefined')tougher(snails,210);
@@ -169,6 +169,11 @@ function moveActor(a,w,h){
  if(floor){a.y=floor.y-h;a.vy=0;a.on=true}else a.on=false;
 }
 
+/*LOOP2_LADY_TO_THROWER*/
+if(LOOP2&&typeof ladybugs!=='undefined'&&Array.isArray(ladybugs)&&typeof throwers!=='undefined'){
+ for(let e of ladybugs)if(e&&e.alive!==0)throwers.push({x:e.x,y:e.y,w:38,h:50,alive:1,face:-1,t:Math.floor(Math.random()*70)});
+ ladybugs.length=0;
+}
 function update(){/*LOOP2_DIFFICULTY*/if(LOOP2&&!window.__loop2Tuned){window.__loop2Tuned=1;for(let name of ['enemies','grasshoppers','snails','frogs','throwers']){let a=window[name];if(Array.isArray(a))for(let e of a){if(typeof e.vx==='number')e.vx*=1.12;if(typeof e.speed==='number')e.speed*=1.12}}}/*NO_GENERIC_LOOP_BULLETS*/if(typeof loopBullets!=='undefined')loopBullets.length=0;
  frame++;if(won)return;
  if(p.inv)p.inv--;if(noticeT)noticeT--;if(p.punchT)p.punchT--;if(p.punchCd)p.punchCd--;if(p.hornT)p.hornT--;if(p.hornCd)p.hornCd--;p.anim+=Math.abs(p.vx)*.16;
@@ -333,7 +338,7 @@ function update(){/*LOOP2_DIFFICULTY*/if(LOOP2&&!window.__loop2Tuned){window.__l
  for(let t of thrownStags){t.x+=t.vx;t.y+=t.vy;t.vy+=.55;t.rot+=t.vr;t.t--}
  thrownStags=thrownStags.filter(t=>t.t>0&&t.y<650);
 
- for(let u of pickups){u.t++;if(u.t<15){u.y+=u.vy;u.vy+=.22}if(R(p,u)){if(u.type==='sap'){p.big=true;if(canStand())setH(62);score+=500}else if(u.type==='bluehorn'){p.blueHorn=true;p.big=true;p.glove=false;if(canStand())setH(62);notice='青角パワー回復！';noticeT=120;score+=800}else if(u.type==='glove'){p.big=true;p.glove=true;if(canStand())setH(62);notice='グローブ！ Bでパンチ';noticeT=130;score+=800}else if(u.type==='leaf'){stars++;score+=300}u.got=1}}
+ for(let u of pickups){u.t++;if(u.t<15){u.y+=u.vy;u.vy+=.22}if(R(p,u)){if(u.type==='sap'){p.big=true;if(canStand())setH(62);score+=500}else if(u.type==='bluehorn'){p.blueHorn=true;p.big=true;p.glove=false;if(canStand())setH(62);notice='青角パワー回復！';noticeT=120;score+=800}else if(u.type==='glove'){p.big=true;p.glove=true;if(canStand())setH(62);notice=p.blueHorn?'青グローブ！ 耐久力MAX':'グローブ！ Bでパンチ';noticeT=130;score+=800}else if(u.type==='leaf'){stars++;score+=300}u.got=1}}
  pickups=pickups.filter(u=>!u.got);
  for(let l of airLeaves)if(!l.got&&R(p,l)){l.got=1;stars++;score+=200;debris(l.x-12,l.y-12,4)}
  for(let d of particles){d.x+=d.vx;d.y+=d.vy;d.vy+=.35;d.t--}particles=particles.filter(d=>d.t>0);

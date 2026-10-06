@@ -32,6 +32,7 @@ canvas{width:100vw;height:auto;max-height:100vh;aspect-ratio:16/9;image-renderin
 <div id="stickKnob"></div></div></div>
 <div class="touch right actions"><button id="B">B</button><button id="J">A</button></div>
 <script>
+const LOOP2=localStorage.getItem('maruchibiLoop2')==='1';
 const c=document.getElementById('c'),g=c.getContext('2d');g.imageSmoothingEnabled=false;
 const carriedScore=Number(localStorage.getItem('maruchibiScore')||0),carriedStars=Number(localStorage.getItem('maruchibiStars')||0),carriedBig=localStorage.getItem('maruchibiBig')==='1',carriedGlove=localStorage.getItem('maruchibiGlove')==='1',carriedBlueHorn=localStorage.getItem('maruchibiBlueHorn')==='1';localStorage.removeItem('maruchibiScore');localStorage.removeItem('maruchibiStars');localStorage.removeItem('maruchibiBig');localStorage.removeItem('maruchibiGlove');localStorage.removeItem('maruchibiBlueHorn');
 const W=960,H=540,GROUND=480,WORLD=7000;
@@ -76,7 +77,7 @@ let switches=[
  {x:6405,y:310,w:34,h:28,on:0}
 ];
 let gate={x:6550,y:0,w:56,h:480,open:0};
-let boss={x:6000,y:GROUND-76,w:68,h:76,vx:-1.35,alive:1,phase:0};
+let boss={blueHP:5,x:6000,y:GROUND-76,w:68,h:76,vx:-1.35,alive:1,phase:0};
 let throwers=[
  {x:610,y:GROUND-50,w:38,h:50,cd:45,alive:1,face:-1},{x:1250,y:GROUND-50,w:38,h:50,cd:75,alive:1,face:-1},
  {x:2190,y:GROUND-50,w:38,h:50,cd:55,alive:1,face:-1},{x:3100,y:GROUND-50,w:38,h:50,cd:80,alive:1,face:-1},
@@ -153,6 +154,11 @@ function moveActor(a,w,h){
  if(floor){a.y=floor.y-h;a.vy=0;a.on=true}else a.on=false;
 }
 
+/*LOOP2_LADY_TO_THROWER*/
+if(LOOP2&&typeof ladybugs!=='undefined'&&Array.isArray(ladybugs)&&typeof throwers!=='undefined'){
+ for(let e of ladybugs)if(e&&e.alive!==0)throwers.push({x:e.x,y:e.y,w:38,h:50,alive:1,face:-1,t:Math.floor(Math.random()*70)});
+ ladybugs.length=0;
+}
 function update(){/*LOOP2_DIFFICULTY*/if(LOOP2&&!window.__loop2Tuned){window.__loop2Tuned=1;for(let name of ['enemies','grasshoppers','snails','frogs','throwers']){let a=window[name];if(Array.isArray(a))for(let e of a){if(typeof e.vx==='number')e.vx*=1.12;if(typeof e.speed==='number')e.speed*=1.12}}}/*NO_GENERIC_LOOP_BULLETS*/if(typeof loopBullets!=='undefined')loopBullets.length=0;
  frame++;if(won){winTimer++;if(winTimer===55)nextStage('world3-1.html');return;}
  if(p.inv)p.inv--;if(noticeT)noticeT--;if(p.punchT)p.punchT--;if(p.punchCd)p.punchCd--;if(p.hornT)p.hornT--;if(p.hornCd)p.hornCd--;p.anim+=Math.abs(p.vx)*.16;
@@ -173,7 +179,7 @@ function update(){/*LOOP2_DIFFICULTY*/if(LOOP2&&!window.__loop2Tuned){window.__l
    if(p.glove&&p.punchCd<=0){p.attackUp=!!U;p.punchT=10;p.punchCd=17}
    else if(!p.glove&&p.hornCd<=0){p.attackUp=!!U;p.hornT=18;p.hornCd=27;if(p.attackUp&&p.on){p.vy=-2.7;p.on=false}}
  }
- if(!p.punchT&&!p.hornT)p.attackUp=false;
+ if(!p.punchT&&!p.hornT){p.attackUp=false;p.hornBossLatch=0;}
  let punch=null;if(p.punchT)punch=p.attackUp?{x:p.x-7,y:p.y-58,w:p.w+14,h:66}:{x:p.face>0?p.x+p.w-2:p.x-58,y:p.y+5,w:60,h:Math.max(34,p.h-8)};
  hornHit=null;hornGuard=null;
  let hornActive=p.hornT<=12&&p.hornT>=6;
@@ -370,7 +376,11 @@ function update(){/*LOOP2_DIFFICULTY*/if(LOOP2&&!window.__loop2Tuned){window.__l
    if(R(p,br)&&p.hornT<=0&&p.punchT<=0)hurt();
    // Attacks only repel the boss briefly; they never kill it.
    if((hornHit&&R(hornHit,br))||(punch&&R(punch,br))){
-     if(p.blueHorn&&hornHit&&R(hornHit,br)){boss.x+=p.face*78;boss.vx=p.face*3.2;bossShots=[];debris(boss.x,boss.y,12);score+=350;notice='青角が効いた！';noticeT=70}else{boss.x+=p.face*55;boss.vx=p.face*2.4;notice='効いてない…逃げよう！';noticeT=70}
+     if(p.blueHorn&&hornHit&&R(hornHit,br)){
+       if(!p.hornBossLatch){p.hornBossLatch=1;boss.blueHP--;boss.x+=p.face*78;boss.vx=p.face*3.2;bossShots=[];debris(boss.x,boss.y,12);score+=350;
+       if(boss.blueHP<=0){boss.alive=0;bossShots=[];debris(boss.x,boss.y,30);score+=3000;notice='青角でボスを倒した！';noticeT=120}
+       else{notice='青角が効いた！ あと '+boss.blueHP+'発';noticeT=70}}
+     }else{boss.x+=p.face*55;boss.vx=p.face*2.4;notice='効いてない…逃げよう！';noticeT=70}
    }
  }
  for(let sh of bossShots){
@@ -380,7 +390,7 @@ function update(){/*LOOP2_DIFFICULTY*/if(LOOP2&&!window.__loop2Tuned){window.__l
  }
  bossShots=bossShots.filter(sh=>sh.t>0);
 
- for(let u of pickups){u.t++;if(u.t<15){u.y+=u.vy;u.vy+=.22}if(u.type!=='leafVisual'&&R(p,u)){if(u.type==='sap'){p.big=true;if(canStand())setH(62);score+=500}else if(u.type==='glove'){p.big=true;p.glove=true;if(canStand())setH(62);notice='グローブ！ Bでパンチ';noticeT=130;score+=800}else if(u.type==='leaf'||u.type==='leafVisual'){stars++;score+=300}u.got=1}}
+ for(let u of pickups){u.t++;if(u.t<15){u.y+=u.vy;u.vy+=.22}if(u.type!=='leafVisual'&&R(p,u)){if(u.type==='sap'){p.big=true;if(canStand())setH(62);score+=500}else if(u.type==='glove'){p.big=true;p.glove=true;if(canStand())setH(62);notice=p.blueHorn?'青グローブ！ 耐久力MAX':'グローブ！ Bでパンチ';noticeT=130;score+=800}else if(u.type==='leaf'||u.type==='leafVisual'){stars++;score+=300}u.got=1}}
  pickups=pickups.filter(u=>!u.got);
  for(let l of airLeaves)if(!l.got&&R(p,l)){l.got=1;stars++;score+=200;debris(l.x-12,l.y-12,4)}
  for(let d of particles){d.x+=d.vx;d.y+=d.vy;d.vy+=.35;d.t--}particles=particles.filter(d=>d.t>0);
