@@ -173,7 +173,7 @@ function moveActor(a,w,h){
 }
 
 function update(){
- frame++;if(won){winTimer++;if(winTimer===55)nextStage('world3-1.html');return;}
+ frame++;if(won){winTimer++;if(winTimer===55)nextStage('world2-4.html');return;}
  if(p.inv)p.inv--;if(noticeT)noticeT--;if(p.punchT)p.punchT--;if(p.punchCd)p.punchCd--;if(p.hornT)p.hornT--;if(p.hornCd)p.hornCd--;p.anim+=Math.abs(p.vx)*.16;
  if(dead){p.vy+=.6;p.y+=p.vy;if(p.y>650)setTimeout(reset,350);return}
 
