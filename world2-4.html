@@ -203,6 +203,12 @@ function update(){
  }
  // Horn scoop: lift enemies from the front and fling them behind the player.
  if(hornHit){
+   /* BLUE HORN TERRAIN BREAK */
+   if(p.blueHorn){
+     if(typeof blocks!=='undefined')for(let b of blocks)if(!b.broken&&R(hornHit,{x:b.x,y:b.y,w:48,h:48})){if(typeof breakBlock==='function')breakBlock(b);else b.broken=1}
+     if(typeof pipes!=='undefined')for(let q of pipes)if(q.alive!==false&&R(hornHit,{x:q.x,y:q.y,w:q.w||72,h:q.h||96})){if(typeof breakPipe==='function')breakPipe(q);else q.alive=false}
+     if(typeof tubes!=='undefined')for(let q of tubes)if(q.alive!==false&&R(hornHit,{x:q.x,y:q.y,w:q.w||72,h:q.h||96})){if(typeof breakPipe==='function')breakPipe(q);else q.alive=false}
+   }
    // A large horn can also scoop-hit item blocks from the side.
    if(p.big)for(let b of blocks)if(!b.broken&&!b.hit&&R(hornHit,{x:b.x,y:b.y,w:48,h:48}))release(b);
    for(let a of ants)if(a.alive&&!a.flat&&R(hornHit,{x:a.x,y:a.y,w:36,h:30})&&!a.thrown){
@@ -623,7 +629,7 @@ function draw(){
    g.save();g.translate(cx,0);if(p.face<0)g.scale(-1,1);
    // Horn scoop ducks only the head; torso and feet stay planted.
    let headAttackDrop=0;
-   if(p.hornT){let e=18-p.hornT;if(e<5)headAttackDrop=5*(e/5);else if(e<12)headAttackDrop=5-4*((e-5)/7);else headAttackDrop=1*(1-Math.min(1,(e-12)/6));}
+   if(p.hornT&&!p.attackUp){let e=18-p.hornT;if(e<5)headAttackDrop=5*(e/5);else if(e<12)headAttackDrop=5-4*((e-5)/7);else headAttackDrop=1*(1-Math.min(1,(e-12)/6));}
    headY+=headAttackDrop;
    // locomotion: biped normally, four grounded limbs when powered-up crouching
    g.strokeStyle='#53606d';g.lineWidth=5;g.lineCap='round';g.beginPath();

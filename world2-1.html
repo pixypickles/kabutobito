@@ -201,14 +201,15 @@ function update(){
  if(p.glide&&p.vy>2.15)p.vy=2.15;
 
  if(keys.punch){
-   if(p.glove&&!p.blueHorn&&p.punchCd<=0){p.punchT=10;p.punchCd=17}
-   else if((!p.glove||p.blueHorn)&&p.hornCd<=0){p.hornT=18;p.hornCd=27}
+   if(p.glove&&!p.blueHorn&&p.punchCd<=0){p.attackUp=!!U;p.punchT=10;p.punchCd=17}
+   else if((!p.glove||p.blueHorn)&&p.hornCd<=0){p.attackUp=!!U;p.hornT=18;p.hornCd=27;if(p.attackUp&&p.on){p.vy=-2.7;p.on=false}}
  }
- let punch=null;if(p.punchT)punch={x:p.face>0?p.x+p.w-2:p.x-58,y:p.y+5,w:60,h:Math.max(34,p.h-8)};
+ if(!p.punchT&&!p.hornT)p.attackUp=false;
+ let punch=null;if(p.punchT)punch=p.attackUp?{x:p.x-7,y:p.y-58,w:p.w+14,h:66}:{x:p.face>0?p.x+p.w-2:p.x-58,y:p.y+5,w:60,h:Math.max(34,p.h-8)};
  hornHit=null;hornGuard=null;
  let hornActive=p.hornT<=12&&p.hornT>=6;
- if(p.hornT)hornGuard={x:p.face>0?p.x+p.w-12:p.x-(p.blueHorn?94:70),y:p.y-10,w:p.blueHorn?98:72,h:p.h+34};
- if(hornActive)hornHit={x:p.face>0?p.x+p.w-9:p.x-(p.blueHorn?90:64),y:p.y+1,w:p.blueHorn?92:66,h:p.h+34};
+ if(p.hornT)hornGuard=p.attackUp?{x:p.x-11,y:p.y-(p.blueHorn?92:65),w:p.w+22,h:p.blueHorn?105:78}:{x:p.face>0?p.x+p.w-12:p.x-(p.blueHorn?94:70),y:p.y-10,w:p.blueHorn?98:72,h:p.h+34};
+ if(hornActive)hornHit=p.attackUp?{x:p.x-10,y:p.y-(p.blueHorn?88:62),w:p.w+20,h:p.blueHorn?92:64}:{x:p.face>0?p.x+p.w-9:p.x-(p.blueHorn?90:64),y:p.y+1,w:p.blueHorn?92:66,h:p.h+34};
 
  p.x+=p.vx;
  for(let s of solids())if(R(p,s)){if(p.vx>0)p.x=s.x-p.w;else if(p.vx<0)p.x=s.x+s.w;p.vx=0}
@@ -226,6 +227,12 @@ function update(){
  }
  // Horn scoop: lift enemies from the front and fling them behind the player.
  if(hornHit){
+   /* BLUE HORN TERRAIN BREAK */
+   if(p.blueHorn){
+     if(typeof blocks!=='undefined')for(let b of blocks)if(!b.broken&&R(hornHit,{x:b.x,y:b.y,w:48,h:48})){if(typeof breakBlock==='function')breakBlock(b);else b.broken=1}
+     if(typeof pipes!=='undefined')for(let q of pipes)if(q.alive!==false&&R(hornHit,{x:q.x,y:q.y,w:q.w||72,h:q.h||96})){if(typeof breakPipe==='function')breakPipe(q);else q.alive=false}
+     if(typeof tubes!=='undefined')for(let q of tubes)if(q.alive!==false&&R(hornHit,{x:q.x,y:q.y,w:q.w||72,h:q.h||96})){if(typeof breakPipe==='function')breakPipe(q);else q.alive=false}
+   }
    /* BLUE HORN DESTROY: shell-level power in loop 2 */
    if(p.blueHorn){
      const zap=(arr)=>{if(!Array.isArray(arr))return;for(let e of arr){if(!e||e.alive===0||typeof e.x!=='number')continue;let rr={x:e.x,y:e.y,w:e.w||42,h:e.h||48};if(R(hornHit,rr)){e.alive=0;if('flat' in e)e.flat=0;debris(e.x,e.y,8);score+=300}}};
@@ -496,7 +503,7 @@ function draw(){
    g.save();g.translate(cx,0);if(p.face<0)g.scale(-1,1);
    // Horn scoop ducks only the head; torso and feet stay planted.
    let headAttackDrop=0;
-   if(p.hornT){let e=18-p.hornT;if(e<5)headAttackDrop=5*(e/5);else if(e<12)headAttackDrop=5-4*((e-5)/7);else headAttackDrop=1*(1-Math.min(1,(e-12)/6));}
+   if(p.hornT&&!p.attackUp){let e=18-p.hornT;if(e<5)headAttackDrop=5*(e/5);else if(e<12)headAttackDrop=5-4*((e-5)/7);else headAttackDrop=1*(1-Math.min(1,(e-12)/6));}
    headY+=headAttackDrop;
    // locomotion: biped normally, four grounded limbs when powered-up crouching
    g.strokeStyle='#53606d';g.lineWidth=5;g.lineCap='round';g.beginPath();
@@ -535,7 +542,7 @@ function draw(){
    g.fillStyle='#d8f3df';g.strokeStyle='#53606d';g.lineWidth=3;g.beginPath();g.ellipse(p.crouch?6:0,headY,headR,headR*.9,0,0,7);g.fill();g.stroke();
    // Horn remains rooted at the original forehead; the body crouches for the low scoop.
    let hornAngle=-48;
-   if(p.hornT){let e=18-p.hornT;if(e<5)hornAngle=-38;else if(e<12){let t=(e-5)/7;hornAngle=-38-45*t}else{let t=Math.min(1,(e-12)/6);hornAngle=-83+35*t}}
+   if(p.hornT&&!p.attackUp){let e=18-p.hornT;if(e<5)hornAngle=-38;else if(e<12){let t=(e-5)/7;hornAngle=-38-45*t}else{let t=Math.min(1,(e-12)/6);hornAngle=-83+35*t}}
    let hrLen=p.big?30:19,baseX=(p.crouch?12:7),baseY=headY-headR*.55,ang=hornAngle*Math.PI/180;
    let tipX=baseX+Math.cos(ang)*hrLen,tipY=baseY+Math.sin(ang)*hrLen;
    g.fillStyle=p.blueHorn?'#d9fbff':'#86c8d8';g.strokeStyle=p.blueHorn?'#62eaff':'#53606d';g.lineWidth=p.blueHorn?4:3;if(p.blueHorn){g.shadowColor='#6eeeff';g.shadowBlur=14}g.beginPath();
