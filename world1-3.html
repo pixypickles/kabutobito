@@ -36,7 +36,7 @@ const c=document.getElementById('c'),g=c.getContext('2d');g.imageSmoothingEnable
 const carriedScore=Number(localStorage.getItem('maruchibiScore')||0),carriedStars=Number(localStorage.getItem('maruchibiStars')||0),carriedBig=localStorage.getItem('maruchibiBig')==='1',carriedGlove=localStorage.getItem('maruchibiGlove')==='1';localStorage.removeItem('maruchibiScore');localStorage.removeItem('maruchibiStars');localStorage.removeItem('maruchibiBig');localStorage.removeItem('maruchibiGlove');
 const LOOP2=localStorage.getItem('maruchibiLoop2')==='1';
 const W=960,H=540,GROUND=480,WORLD=6200;
-let keys={},cam=0,score=carriedScore,stars=carriedStars,dead=false,won=false,jumpHeld=false,notice='',noticeT=0,frame=0,hornHit=null,hornGuard=null;
+let keys={},cam=0,score=carriedScore,stars=carriedStars,dead=false,won=false,jumpHeld=false,notice='',noticeT=0,frame=0,hornHit=null,hornGuard=null,winTimer=0;
 const p={x:90,y:GROUND-44,w:38,h:44,vx:0,vy:0,on:false,big:carriedBig,glove:carriedGlove,face:1,crouch:false,inv:0,anim:0,punchT:0,punchCd:0,hornT:0,hornCd:0,blueHorn:LOOP2};
 if(LOOP2){p.blueHorn=true;p.big=true;p.glove=true;if(p.h<62){let _f=p.y+p.h;p.h=62;p.y=_f-62;}}
 
@@ -139,7 +139,33 @@ function scoopProtected(r){
  return p.hornT>0;
 }
 
+
+// Shared item art: broad blue leaf with visible veins, and bottled tree sap.
+function drawBlueLeaf(cx,cy,scale=1){
+ g.save();g.translate(cx,cy);g.scale(scale,scale);g.rotate(-.45);
+ g.fillStyle='#55aee8';g.strokeStyle='#244f78';g.lineWidth=2;
+ g.beginPath();g.moveTo(0,-15);g.bezierCurveTo(12,-11,14,2,0,15);g.bezierCurveTo(-14,2,-12,-11,0,-15);g.fill();g.stroke();
+ g.strokeStyle='#d8f4ff';g.lineWidth=1.6;g.beginPath();g.moveTo(0,-12);g.lineTo(0,14);
+ for(let yy=-7;yy<=7;yy+=7){g.moveTo(0,yy);g.lineTo(7,yy-5);g.moveTo(0,yy);g.lineTo(-7,yy-5)}g.stroke();
+ g.strokeStyle='#244f78';g.lineWidth=2;g.beginPath();g.moveTo(0,14);g.lineTo(6,20);g.stroke();g.restore();
+}
+function drawSapBottle(cx,cy,scale=1){
+ g.save();g.translate(cx,cy);g.scale(scale,scale);
+ g.fillStyle='#f4fbff99';g.strokeStyle='#d9f4ff';g.lineWidth=2;g.beginPath();
+ g.moveTo(-6,-15);g.lineTo(6,-15);g.lineTo(7,-9);g.quadraticCurveTo(13,-5,13,5);g.lineTo(13,13);g.quadraticCurveTo(0,18,-13,13);g.lineTo(-13,5);g.quadraticCurveTo(-13,-5,-7,-9);g.closePath();g.fill();g.stroke();
+ g.fillStyle='#d98b28';g.beginPath();g.moveTo(-11,2);g.lineTo(11,2);g.lineTo(11,12);g.quadraticCurveTo(0,16,-11,12);g.closePath();g.fill();
+ g.fillStyle='#79502d';g.fillRect(-7,-19,14,5);g.fillStyle='#fff6d6';g.strokeStyle='#8b6536';g.lineWidth=1;g.fillRect(-10,3,20,8);
+ g.fillStyle='#68451f';g.font='bold 6px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('樹液',0,7);g.restore();
+}
+
 function reset(){location.reload()}
+function nextStage(url){
+ localStorage.setItem('maruchibiScore',String(score));localStorage.setItem('maruchibiStars',String(stars));
+ localStorage.setItem('maruchibiBig',p.big?'1':'0');localStorage.setItem('maruchibiGlove',p.glove?'1':'0');localStorage.setItem('maruchibiBlueHorn',p.blueHorn?'1':'0');
+ if(typeof misses!=='undefined')localStorage.setItem('maruchibiMisses',String(misses));
+ location.href=url;
+}
+
 onkeydown=e=>{let k=e.key.toLowerCase();keys[k]=1;if(k==='b')keys.punch=1;if(k==='r')reset()};
 onkeyup=e=>{let k=e.key.toLowerCase();keys[k]=0;if(k==='b')keys.punch=0};
 document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('selectstart',e=>e.preventDefault());
@@ -162,7 +188,7 @@ function moveActor(a,w,h){
 }
 
 function update(){
- frame++;if(won)return;
+ frame++;if(won){winTimer++;if(winTimer===55)nextStage('world1-4.html');return;}
  if(p.inv)p.inv--;if(noticeT)noticeT--;if(p.punchT)p.punchT--;if(p.punchCd)p.punchCd--;if(p.hornT)p.hornT--;if(p.hornCd)p.hornCd--;p.anim+=Math.abs(p.vx)*.16;
  if(dead){p.vy+=.6;p.y+=p.vy;if(p.y>650)setTimeout(reset,350);return}
 
@@ -364,14 +390,9 @@ function draw(){
  }
  for(let l of lifts){g.fillStyle='#a77b53';g.strokeStyle='#5c4435';g.lineWidth=3;g.fillRect(l.x,l.y,l.w,l.h);g.strokeRect(l.x,l.y,l.w,l.h);g.fillStyle='#d9bd7f';for(let x=l.x+10;x<l.x+l.w-8;x+=22)g.fillRect(x,l.y+5,12,5)}
 
- for(let b of blocks)if(!b.broken){g.fillStyle=b.hit?'#b99973':b.type==='bluehorn'?'#b9f6ff':b.type==='glove'?'#ffd0b0':'#ffd65a';g.fillRect(b.x,b.y,48,48);g.strokeStyle='#7e613e';g.lineWidth=3;g.strokeRect(b.x+2,b.y+2,44,44);if(!b.hit){g.fillStyle='#fff';g.font='26px sans-serif';g.fillText(b.type==='bluehorn'?'✦':b.type==='glove'?'🥊':b.type==='leaf'?'🍃':'✦',b.x+8,b.y+34)}}
+ for(let b of blocks)if(!b.broken){g.fillStyle=b.hit?'#b99973':b.type==='bluehorn'?'#b9f6ff':b.type==='glove'?'#ffd0b0':'#ffd65a';g.fillRect(b.x,b.y,48,48);g.strokeStyle='#7e613e';g.lineWidth=3;g.strokeRect(b.x+2,b.y+2,44,44);if(!b.hit){if(b.type==='leaf')drawBlueLeaf(b.x+24,b.y+23,.72);else if(b.type==='sap')drawSapBottle(b.x+24,b.y+24,.62);else{g.fillStyle='#fff';g.font='26px sans-serif';g.fillText(b.type==='bluehorn'?'✦':'🥊',b.x+8,b.y+34)}}}
  for(let u of pickups){
-   if(u.type==='sap'){
-     let sx=u.x+15,sy=u.y+16;
-     g.fillStyle='#e6a33b';g.strokeStyle='#7b5830';g.lineWidth=2;
-     g.beginPath();g.moveTo(sx,sy-15);g.quadraticCurveTo(sx-14,sy+1,sx-10,sy+10);g.quadraticCurveTo(sx,sy+20,sx+10,sy+10);g.quadraticCurveTo(sx+14,sy+1,sx,sy-15);g.fill();g.stroke();
-     g.fillStyle='#ffe5a3';g.beginPath();g.arc(sx-4,sy+3,3,0,7);g.fill();
-   }else if(u.type==='glove'){g.font='34px sans-serif';g.fillText('🥊',u.x,u.y+30)}else{let lx=u.x+15,ly=u.y+15;g.save();g.translate(lx,ly);g.rotate(-.45);g.fillStyle='#5aa9e6';g.strokeStyle='#315f85';g.lineWidth=2;g.beginPath();g.ellipse(0,0,9,15,0,0,7);g.fill();g.stroke();g.beginPath();g.moveTo(-1,12);g.lineTo(7,20);g.stroke();g.restore()}
+   if(u.type==='sap'){drawSapBottle(u.x+15,u.y+15,.9)}else if(u.type==='glove'){g.font='34px sans-serif';g.fillText('🥊',u.x,u.y+30)}else if(u.type==='leaf'||u.type==='leafFx'){drawBlueLeaf(u.x+15,u.y+15,.9)}
  }
 
  // wooden tubes
@@ -455,7 +476,7 @@ function draw(){
  }
 
  // airborne beetle-leaf collectibles
- for(let l of airLeaves)if(!l.got){let bob=Math.sin(frame*.08+l.x*.02)*3;g.save();g.translate(l.x+12,l.y+12+bob);g.rotate(-.55);g.fillStyle='#5aa9e6';g.strokeStyle='#315f85';g.lineWidth=2;g.beginPath();g.ellipse(0,0,8,14,0,0,7);g.fill();g.stroke();g.beginPath();g.moveTo(-1,11);g.lineTo(6,19);g.stroke();g.restore()}
+ for(let l of airLeaves)if(!l.got){let bob=Math.sin(frame*.08+l.x*.02)*3;drawBlueLeaf(l.x+12,l.y+12+bob,.85)}
 
  // debris
  for(let d of particles){g.fillStyle='#9b6a43';g.fillRect(d.x,d.y,d.r,d.r)}
@@ -588,7 +609,7 @@ function draw(){
  }
  g.restore();
 
- g.fillStyle='#fff';g.font='bold 22px monospace';g.fillText('MARUCHIBI',24,30);g.fillText(String(score).padStart(6,'0'),24,55);g.fillText('🍃 '+stars,190,55);g.fillText('WORLD  1-3',720,30);
+ g.fillStyle='#fff';g.font='bold 22px monospace';g.fillText('KABUTOBITO',24,30);g.fillText(String(score).padStart(6,'0'),24,55);g.fillText('🍃 '+stars,190,55);g.fillText('WORLD  1-3',720,30);
  if(noticeT){g.fillStyle='#0009';g.fillRect(260,75,440,42);g.fillStyle='#fff';g.font='bold 20px sans-serif';g.fillText(notice,340,103)}
  if(dead){g.fillStyle='#0009';g.fillRect(0,0,W,H);g.fillStyle='#fff';g.font='bold 42px sans-serif';g.fillText('しょんぼり…',350,270)}
  if(won){g.fillStyle='#0009';g.fillRect(0,0,W,H);g.fillStyle='#fff';g.font='bold 44px sans-serif';g.fillText('やったー！',365,235);g.font='25px sans-serif';g.fillText('ゴール！ SCORE '+score,330,285)}

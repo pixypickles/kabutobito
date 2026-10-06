@@ -26,3 +26,9 @@ GitHub Pages を有効にすると `index.html` からそのまま遊べます�
 ## 構成
 
 `index.html` がタイトル画面、`world1-1.html` ～ `world3-4.html` が各ステージです。セーブ・クリア・2周目の状態はブラウザの localStorage を使用します。
+
+
+## v2 fixes
+- Blue leaves use the same broad, veined blue-leaf artwork in every stage.
+- Tree sap is shown in a labeled glass bottle in every stage.
+- Fixed stage-clear routing, including WORLD 1-3 -> WORLD 1-4 and later worlds.

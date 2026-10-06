@@ -149,6 +149,25 @@ function scoopProtected(r){
  return p.hornT>0;
 }
 
+
+// Shared item art: broad blue leaf with visible veins, and bottled tree sap.
+function drawBlueLeaf(cx,cy,scale=1){
+ g.save();g.translate(cx,cy);g.scale(scale,scale);g.rotate(-.45);
+ g.fillStyle='#55aee8';g.strokeStyle='#244f78';g.lineWidth=2;
+ g.beginPath();g.moveTo(0,-15);g.bezierCurveTo(12,-11,14,2,0,15);g.bezierCurveTo(-14,2,-12,-11,0,-15);g.fill();g.stroke();
+ g.strokeStyle='#d8f4ff';g.lineWidth=1.6;g.beginPath();g.moveTo(0,-12);g.lineTo(0,14);
+ for(let yy=-7;yy<=7;yy+=7){g.moveTo(0,yy);g.lineTo(7,yy-5);g.moveTo(0,yy);g.lineTo(-7,yy-5)}g.stroke();
+ g.strokeStyle='#244f78';g.lineWidth=2;g.beginPath();g.moveTo(0,14);g.lineTo(6,20);g.stroke();g.restore();
+}
+function drawSapBottle(cx,cy,scale=1){
+ g.save();g.translate(cx,cy);g.scale(scale,scale);
+ g.fillStyle='#f4fbff99';g.strokeStyle='#d9f4ff';g.lineWidth=2;g.beginPath();
+ g.moveTo(-6,-15);g.lineTo(6,-15);g.lineTo(7,-9);g.quadraticCurveTo(13,-5,13,5);g.lineTo(13,13);g.quadraticCurveTo(0,18,-13,13);g.lineTo(-13,5);g.quadraticCurveTo(-13,-5,-7,-9);g.closePath();g.fill();g.stroke();
+ g.fillStyle='#d98b28';g.beginPath();g.moveTo(-11,2);g.lineTo(11,2);g.lineTo(11,12);g.quadraticCurveTo(0,16,-11,12);g.closePath();g.fill();
+ g.fillStyle='#79502d';g.fillRect(-7,-19,14,5);g.fillStyle='#fff6d6';g.strokeStyle='#8b6536';g.lineWidth=1;g.fillRect(-10,3,20,8);
+ g.fillStyle='#68451f';g.font='bold 6px sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText('樹液',0,7);g.restore();
+}
+
 function reset(){location.reload()}
 onkeydown=e=>{let k=e.key.toLowerCase();keys[k]=1;if(k==='b')keys.punch=1;if(k==='r')reset()};
 onkeyup=e=>{let k=e.key.toLowerCase();keys[k]=0;if(k==='b')keys.punch=0};
@@ -460,16 +479,7 @@ function draw(){
    }
 }
  for(let u of pickups){
-   if(u.type==='sap'){
-     // clear glass bottle filled with amber tree sap
-     let sx=u.x+15,sy=u.y+16;g.save();
-     g.strokeStyle='#e8f7ff';g.lineWidth=2.4;g.fillStyle='rgba(220,245,255,.34)';
-     g.beginPath();g.roundRect(sx-11,sy-10,22,27,6);g.fill();g.stroke();
-     g.fillStyle='#8a6235';g.fillRect(sx-6,sy-17,12,7);g.strokeStyle='#5d4329';g.strokeRect(sx-6,sy-17,12,7);
-     g.fillStyle='#e5a238';g.beginPath();g.roundRect(sx-8,sy+1,16,13,4);g.fill();
-     g.fillStyle='#fff3c8';g.strokeStyle='#9b6b2d';g.lineWidth=1;g.beginPath();g.roundRect(sx-9,sy-5,18,10,2);g.fill();g.stroke();
-     g.fillStyle='#6b491f';g.font='bold 7px sans-serif';g.textAlign='center';g.fillText('樹液',sx,sy+2);g.textAlign='start';g.restore();
-   }else if(u.type==='glove'){g.font='34px sans-serif';g.fillText('🥊',u.x,u.y+30)}else if(u.type==='bluehorn'){g.save();g.translate(u.x+15,u.y+17);g.shadowColor='#bff8ff';g.shadowBlur=16;g.fillStyle='#9eeeff';g.strokeStyle='#eaffff';g.lineWidth=3;g.beginPath();g.moveTo(-8,10);g.quadraticCurveTo(5,-3,10,-17);g.quadraticCurveTo(14,-5,5,13);g.closePath();g.fill();g.stroke();g.restore()}else{
+   if(u.type==='sap'){drawSapBottle(u.x+15,u.y+15,.9)}else if(u.type==='glove'){g.font='34px sans-serif';g.fillText('🥊',u.x,u.y+30)}else if(u.type==='bluehorn'){g.save();g.translate(u.x+15,u.y+17);g.shadowColor='#bff8ff';g.shadowBlur=16;g.fillStyle='#9eeeff';g.strokeStyle='#eaffff';g.lineWidth=3;g.beginPath();g.moveTo(-8,10);g.quadraticCurveTo(5,-3,10,-17);g.quadraticCurveTo(14,-5,5,13);g.closePath();g.fill();g.stroke();g.restore()}else{
      let lx=u.x+15,ly=u.y+15;g.save();g.translate(lx,ly);g.rotate(-.48);
      g.fillStyle='#4d9fd8';g.strokeStyle='#285f88';g.lineWidth=2.4;
      g.beginPath();g.moveTo(-13,0);g.quadraticCurveTo(-5,-11,8,-9);g.quadraticCurveTo(15,-5,14,0);
@@ -727,7 +737,7 @@ function draw(){
  }
  g.restore();
 
- g.fillStyle='#fff';g.font='bold 22px monospace';g.fillText('MARUCHIBI',24,30);g.fillText(String(score).padStart(6,'0'),24,55);g.fillText('🍃 '+stars,190,55);g.fillText('MISS '+misses,330,55);g.fillText('WORLD  3-4',720,30);
+ g.fillStyle='#fff';g.font='bold 22px monospace';g.fillText('KABUTOBITO',24,30);g.fillText(String(score).padStart(6,'0'),24,55);g.fillText('🍃 '+stars,190,55);g.fillText('MISS '+misses,330,55);g.fillText('WORLD  3-4',720,30);
  if(noticeT){g.fillStyle='#0009';g.fillRect(260,75,440,42);g.fillStyle='#fff';g.font='bold 20px sans-serif';g.fillText(notice,340,103)}
  if(dead){g.fillStyle='#0009';g.fillRect(0,0,W,H);g.fillStyle='#fff';g.font='bold 42px sans-serif';g.fillText('しょんぼり…',350,270)}
  if(won){localStorage.setItem('maruchibiCleared','1');let bonus=Math.floor(stars/30),finalMiss=Math.max(0,misses-bonus);g.fillStyle='#07111aee';g.fillRect(0,0,W,H);g.fillStyle='#dffaff';g.textAlign='center';g.font='bold 46px sans-serif';g.fillText('カブトビト大冒険 クリア！',W/2,150);g.font='26px sans-serif';g.fillText('ボスを倒して、お城に平和が戻った！',W/2,205);g.font='bold 25px monospace';g.fillText('SCORE  '+score,W/2,265);g.fillText('青葉っぱ  '+stars+' 枚',W/2,305);g.fillText('実ミス  '+misses+' 回',W/2,345);g.fillStyle='#9eeeff';g.fillText('葉っぱボーナス  -'+bonus+' 回  （30枚につき -1）',W/2,385);g.fillStyle='#fff';g.font='bold 34px sans-serif';g.fillText('最終ミス  '+finalMiss+' 回',W/2,440);g.textAlign='left'}
