@@ -123,7 +123,7 @@ function hurt(force=false){if(p.hornT>0&&!force)return;
  if(p.inv)return;
  if(p.glove){p.glove=false;p.inv=100;p.vy=-5}
  else if(p.big){p.big=false;p.crouch=false;setH(44);p.inv=100;p.vy=-5}
- else{dead=true;p.vy=-9}
+ else{dead=true;p.vy=-9;localStorage.setItem('maruchibiMisses',String(Number(localStorage.getItem('maruchibiMisses')||0)+1))}
 }
 function breakBlock(b){if(!b||b.broken)return;release(b);b.broken=1;debris(b.x,b.y,9);score+=100}
 function breakPipe(q){if(!q.alive)return;q.alive=0;debris(q.x,q.y,15);score+=500}
@@ -159,7 +159,8 @@ function reset(){location.reload()}
 function nextStage(url){
  localStorage.setItem('maruchibiScore',String(score));localStorage.setItem('maruchibiStars',String(stars));
  localStorage.setItem('maruchibiBig',p.big?'1':'0');localStorage.setItem('maruchibiGlove',p.glove?'1':'0');localStorage.setItem('maruchibiBlueHorn',p.blueHorn?'1':'0');
- location.href=url;
+ localStorage.setItem('kabutobitoClearedStage','1-4');localStorage.setItem('kabutobitoNextStage',url);
+ location.href='stage-clear.html';
 }
 onkeydown=e=>{let k=e.key.toLowerCase();keys[k]=1;if(k==='b')keys.punch=1;if(k==='r')reset()};
 onkeyup=e=>{let k=e.key.toLowerCase();keys[k]=0;if(k==='b')keys.punch=0};

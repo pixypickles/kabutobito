@@ -162,8 +162,8 @@ function reset(){location.reload()}
 function nextStage(url){
  localStorage.setItem('maruchibiScore',String(score));localStorage.setItem('maruchibiStars',String(stars));
  localStorage.setItem('maruchibiBig',p.big?'1':'0');localStorage.setItem('maruchibiGlove',p.glove?'1':'0');localStorage.setItem('maruchibiBlueHorn',p.blueHorn?'1':'0');
- if(typeof misses!=='undefined')localStorage.setItem('maruchibiMisses',String(misses));
- location.href=url;
+ localStorage.setItem('kabutobitoClearedStage','3-2');localStorage.setItem('kabutobitoNextStage',url);
+ location.href='stage-clear.html';
 }
 
 onkeydown=e=>{let k=e.key.toLowerCase();keys[k]=1;if(k==='b')keys.punch=1;if(k==='r')reset()};
