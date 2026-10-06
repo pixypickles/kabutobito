@@ -101,9 +101,9 @@ function debris(x,y,n=7){
 }
 function release(b){
  if(!b||b.released)return;b.released=1;b.hit=1;
- // A blue leaf from a block is credited the instant it pops out (coin-style).
+ // Block leaves are collected instantly when the block is hit; the popped leaf is visual only.
  if(b.type==='leaf'){
-   stars++;score+=400;
+   stars++;score+=400;notice='青葉っぱ +1';noticeT=55;
    pickups.push({x:b.x+10,y:b.y-34,w:30,h:30,type:'leafFx',vy:-3,t:0,got:0});
  }else{
    pickups.push({x:b.x+10,y:b.y-34,w:30,h:30,type:b.type,vy:-3,t:0});score+=100;
