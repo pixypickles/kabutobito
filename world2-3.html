@@ -616,7 +616,7 @@ function draw(){
    let hornAngle=p.lookUp?-72:-48;
    if(p.attackUp&&p.hornT)hornAngle=-90;
    else if(p.hornT&&!p.attackUp){let e=18-p.hornT;if(e<5)hornAngle=-38;else if(e<12){let t=(e-5)/7;hornAngle=-38-45*t}else{let t=Math.min(1,(e-12)/6);hornAngle=-83+35*t}}
-   let hrLen=p.big?30:19,baseX=p.attackUp?2:(p.crouch?12:7),baseY=headY-headR*.55,ang=hornAngle*Math.PI/180;
+   let hrLen=p.big?30:19,baseX=p.attackUp?2:(p.crouch?12:7),baseY=headY-headR*.78,ang=hornAngle*Math.PI/180;
    let tipX=baseX+Math.cos(ang)*hrLen,tipY=baseY+Math.sin(ang)*hrLen;
    g.fillStyle=p.blueHorn?'#d9fbff':'#86c8d8';g.strokeStyle=p.blueHorn?'#62eaff':'#53606d';g.lineWidth=p.blueHorn?4:3;if(p.blueHorn){g.shadowColor='#6eeeff';g.shadowBlur=14}g.beginPath();
    g.moveTo(baseX,baseY+5);g.quadraticCurveTo((baseX+tipX)/2+5,(baseY+tipY)/2+4,tipX,tipY);
