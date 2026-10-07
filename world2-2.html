@@ -232,10 +232,10 @@ function update(){/*LOOP2_BLUE_PERMANENT*/if(LOOP2&&!p.blueHorn)p.blueHorn=true;
  if(p.vy>2.4)p.vy=2.4;
  if(p.vy<-4.8)p.vy=-4.8;
 
- /*BLUE_AIR_HOP_V22*/
- let _aNow=!!keys.a;
- if(p.blueHorn&&!p.on&&_aNow&&!p._aPrev){p.vy=-8.0;if('glide' in p)p.glide=false;}
- p._aPrev=_aNow;
+ /*BLUE_AIR_HOP_V24*/
+ let _airJumpNow=!!J;
+ if(p.blueHorn&&!p.on&&_airJumpNow&&!p._airJumpPrev){p.vy=-8.0;p.glide=false;}
+ p._airJumpPrev=_airJumpNow;
 
  if(keys.punch){
    if(p.glove&&!p.blueHorn&&p.punchCd<=0){p.attackUp=!!U;p.punchT=10;p.punchCd=17}
