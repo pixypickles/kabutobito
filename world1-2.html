@@ -517,7 +517,7 @@ function draw(){
    // head
    g.fillStyle='#d8f3df';g.strokeStyle='#53606d';g.lineWidth=3;g.beginPath();g.ellipse(p.crouch?6:0,headY,headR,headR*.9,0,0,7);g.fill();g.stroke();
    // Horn remains rooted at the original forehead; the body crouches for the low scoop.
-   let hornAngle=-48;
+   let hornAngle=(p.hornT&&p.attackUp)?-90:-48;
    if(p.hornT&&!p.attackUp){let e=18-p.hornT;if(e<5)hornAngle=-38;else if(e<12){let t=(e-5)/7;hornAngle=-38-45*t}else{let t=Math.min(1,(e-12)/6);hornAngle=-83+35*t}}
    let hrLen=p.big?30:19,baseX=(p.crouch?12:7),baseY=headY-headR*.55,ang=hornAngle*Math.PI/180;
    let tipX=baseX+Math.cos(ang)*hrLen,tipY=baseY+Math.sin(ang)*hrLen;
