@@ -175,12 +175,12 @@ function drawSapBottle(cx,cy,scale=1){
 }
 
 function reset(){location.reload()}
-onkeydown=e=>{let k=e.key.toLowerCase();if(won&&(k==='b'||k==='enter')){location.href='index.html';return}keys[k]=1;if(k==='b')keys.punch=1;if(k==='r')reset()};
+onkeydown=e=>{let k=e.key.toLowerCase();if(won&&(k==='b'||k==='enter'||e.code==='KeyB'||e.code==='Enter')){location.href='index.html';return}keys[k]=1;if(k==='b')keys.punch=1;if(k==='r')reset()};
 onkeyup=e=>{let k=e.key.toLowerCase();keys[k]=0;if(k==='b')keys.punch=0};
 document.addEventListener('contextmenu',e=>e.preventDefault());document.addEventListener('selectstart',e=>e.preventDefault());
 window.addEventListener('blur',()=>keys={});
 
-function bindHold(id,k){let b=document.getElementById(id);b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture?.(e.pointerId);keys[k]=1};let up=e=>{e.preventDefault();keys[k]=0};b.onpointerup=up;b.onpointercancel=up;b.onlostpointercapture=()=>keys[k]=0}
+function bindHold(id,k){let b=document.getElementById(id);b.onpointerdown=e=>{e.preventDefault();if(won&&id==='B'){location.href='index.html';return}b.setPointerCapture?.(e.pointerId);keys[k]=1};let up=e=>{e.preventDefault();keys[k]=0};b.onpointerup=up;b.onpointercancel=up;b.onlostpointercapture=()=>keys[k]=0}
 bindHold('J','z');bindHold('B','punch');
 const sb=document.getElementById('stickBase'),sk=document.getElementById('stickKnob');let sid=null;
 function sm(e){let r=sb.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.hypot(dx,dy),m=43;if(d>m){dx*=m/d;dy*=m/d}sk.style.transform=`translate(${dx}px,${dy}px)`;keys.arrowleft=dx<-18;keys.arrowright=dx>18;keys.arrowdown=dy>25;keys.arrowup=dy<-30}
@@ -196,11 +196,7 @@ function moveActor(a,w,h){
  if(floor){a.y=floor.y-h;a.vy=0;a.on=true}else a.on=false;
 }
 
-function update(){/*LOOP2_BLUE_PERMANENT*/if(LOOP2&&!p.blueHorn)p.blueHorn=true;/*BLUE_AIR_HOP*/
- let _aNow=!!keys.a;
- if(p.blueHorn&&!p.on&&_aNow&&!p._aPrev){p.vy=-6.2;}
- p._aPrev=_aNow;
-/*LOOP2_DIFFICULTY*/if(LOOP2&&!window.__loop2Tuned){window.__loop2Tuned=1;for(let name of ['enemies','grasshoppers','snails','frogs','throwers']){let a=window[name];if(Array.isArray(a))for(let e of a){if(typeof e.vx==='number')e.vx*=1.12;if(typeof e.speed==='number')e.speed*=1.12}}}/*NO_GENERIC_LOOP_BULLETS*/if(typeof loopBullets!=='undefined')loopBullets.length=0;
+function update(){/*LOOP2_BLUE_PERMANENT*/if(LOOP2&&!p.blueHorn)p.blueHorn=true;/*LOOP2_DIFFICULTY*/if(LOOP2&&!window.__loop2Tuned){window.__loop2Tuned=1;for(let name of ['enemies','grasshoppers','snails','frogs','throwers']){let a=window[name];if(Array.isArray(a))for(let e of a){if(typeof e.vx==='number')e.vx*=1.12;if(typeof e.speed==='number')e.speed*=1.12}}}/*NO_GENERIC_LOOP_BULLETS*/if(typeof loopBullets!=='undefined')loopBullets.length=0;
  frame++;if(won)return;
  if(p.inv)p.inv--;if(noticeT)noticeT--;if(p.punchT)p.punchT--;if(p.punchCd)p.punchCd--;if(p.hornT)p.hornT--;if(p.hornCd)p.hornCd--;p.anim+=Math.abs(p.vx)*.16;
  if(dead){p.vy+=.6;p.y+=p.vy;if(p.y>650)setTimeout(reset,350);return}
@@ -215,6 +211,11 @@ function update(){/*LOOP2_BLUE_PERMANENT*/if(LOOP2&&!p.blueHorn)p.blueHorn=true;
  jumpHeld=!!J;
  p.vy=Math.min(p.vy+.58,14);
  if(p.glide&&p.vy>2.15)p.vy=2.15;
+
+ /*BLUE_AIR_HOP_V22*/
+ let _aNow=!!keys.a;
+ if(p.blueHorn&&!p.on&&_aNow&&!p._aPrev){p.vy=-8.0;if('glide' in p)p.glide=false;}
+ p._aPrev=_aNow;
 
  if(keys.punch){
    if(p.glove&&!p.blueHorn&&p.punchCd<=0){p.attackUp=!!U;p.punchT=10;p.punchCd=17}
