@@ -507,7 +507,7 @@ function draw(){
    // back arm
    let arm=air?-7:(moving?Math.sin(p.anim+Math.PI)*4:1);g.strokeStyle='#53606d';g.lineWidth=4;g.beginPath();g.moveTo(-11,bodyY-2);g.lineTo(-17,bodyY+arm);g.stroke();
    // punch arm/glove
-   if(p.glove){let reach=p.punchT?28:4,fx=20+reach,fy=bodyY-4;g.strokeStyle='#c9f0df';g.lineWidth=7;g.beginPath();g.moveTo(10,bodyY-3);g.lineTo(fx-8,fy);g.stroke();g.fillStyle='#ef6f78';g.strokeStyle='#53606d';g.lineWidth=3;g.beginPath();g.arc(fx,fy,9,0,7);g.fill();g.stroke()}
+   if(p.glove){let reach=p.punchT?28:4,fx=20+reach,fy=bodyY-4;g.strokeStyle='#c9f0df';g.lineWidth=7;g.beginPath();g.moveTo(10,bodyY-3);g.lineTo(fx-8,fy);g.stroke();g.fillStyle=(p.blueHorn&&p.glove)?'#27b8ff':'#ef6f78';g.strokeStyle=(p.blueHorn&&p.glove)?'#d9fbff':'#53606d';g.lineWidth=3;g.beginPath();g.arc(fx,fy,9,0,7);g.fill();g.stroke()}
    else{g.strokeStyle='#53606d';g.lineWidth=4;g.beginPath();g.moveTo(11,bodyY-2);g.lineTo(17,bodyY-arm);g.stroke()}
    // head
    g.fillStyle='#d8f3df';g.strokeStyle='#53606d';g.lineWidth=3;g.beginPath();g.ellipse(p.crouch?6:0,headY,headR,headR*.9,0,0,7);g.fill();g.stroke();

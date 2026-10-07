@@ -38,7 +38,7 @@ const LOOP2=localStorage.getItem('maruchibiLoop2')==='1';
 const W=960,H=540,GROUND=480,WORLD=6600;
 let keys={},cam=0,score=carriedScore,stars=carriedStars,dead=false,won=false,jumpHeld=false,notice='',noticeT=0,frame=0,hornHit=null,hornGuard=null,stageExit=0;
 const p={x:90,y:GROUND-44,w:38,h:44,vx:0,vy:0,on:false,big:carriedBig,glove:carriedGlove,face:1,crouch:false,inv:0,anim:0,punchT:0,punchCd:0,hornT:0,hornCd:0,blueHorn:LOOP2};
-if(LOOP2){p.blueHorn=true;p.big=true;p.glove=false;if(p.h<62){let _f=p.y+p.h;p.h=62;p.y=_f-62;}}
+if(LOOP2){p.blueHorn=true;}
 
 
 if(p.big){let f=p.y+p.h;p.h=62;p.y=f-62}
@@ -654,7 +654,7 @@ g.strokeStyle='#285f88';g.lineWidth=2.2;g.beginPath();g.moveTo(-12,1);g.lineTo(-
    // back arm
    let arm=air?-7:(moving?Math.sin(p.anim+Math.PI)*4:1);g.strokeStyle='#53606d';g.lineWidth=4;g.beginPath();g.moveTo(-11,bodyY-2);g.lineTo(-17,bodyY+arm);g.stroke();
    // punch arm/glove
-   if(p.glove){let reach=p.punchT?28:4,fx=20+reach,fy=bodyY-4;g.strokeStyle='#c9f0df';g.lineWidth=7;g.beginPath();g.moveTo(10,bodyY-3);g.lineTo(fx-8,fy);g.stroke();g.fillStyle='#ef6f78';g.strokeStyle='#53606d';g.lineWidth=3;g.beginPath();g.arc(fx,fy,9,0,7);g.fill();g.stroke()}
+   if(p.glove){let reach=p.punchT?28:4,fx=20+reach,fy=bodyY-4;g.strokeStyle='#c9f0df';g.lineWidth=7;g.beginPath();g.moveTo(10,bodyY-3);g.lineTo(fx-8,fy);g.stroke();g.fillStyle=(p.blueHorn&&p.glove)?'#27b8ff':'#ef6f78';g.strokeStyle=(p.blueHorn&&p.glove)?'#d9fbff':'#53606d';g.lineWidth=3;g.beginPath();g.arc(fx,fy,9,0,7);g.fill();g.stroke()}
    else{g.strokeStyle='#53606d';g.lineWidth=4;g.beginPath();g.moveTo(11,bodyY-2);g.lineTo(17,bodyY-arm);g.stroke()}
    // head
    g.fillStyle='#d8f3df';g.strokeStyle='#53606d';g.lineWidth=3;g.beginPath();g.ellipse(p.crouch?6:0,headY,headR,headR*.9,0,0,7);g.fill();g.stroke();
