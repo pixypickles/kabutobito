@@ -231,13 +231,7 @@ function update(){/*LOOP2_BLUE_PERMANENT*/if(LOOP2&&!p.blueHorn)p.blueHorn=true;
  }
  if(p.vy>2.4)p.vy=2.4;
  if(p.vy<-4.8)p.vy=-4.8;
-
- /*BLUE_AIR_HOP_V24*/
- let _airJumpNow=!!J;
- if(p.blueHorn&&!p.on&&_airJumpNow&&!p._airJumpPrev){p.vy=-8.0;p.glide=false;}
- p._airJumpPrev=_airJumpNow;
-
- if(keys.punch){
+if(keys.punch){
    if(p.glove&&!p.blueHorn&&p.punchCd<=0){p.attackUp=!!U;p.punchT=10;p.punchCd=17}
    else if((!p.glove||p.blueHorn)&&p.hornCd<=0){p.attackUp=!!U;p.hornT=18;p.hornCd=27;if(p.attackUp&&p.on){p.vy=-2.7;p.on=false}}
  }

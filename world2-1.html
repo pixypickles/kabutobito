@@ -201,17 +201,11 @@ function update(){/*LOOP2_BLUE_PERMANENT*/if(LOOP2&&!p.blueHorn)p.blueHorn=true;
  let max=p.crouch?2.2:7.2;if(L){p.vx=Math.max(p.vx-.48,-max);p.face=-1}if(Rt){p.vx=Math.min(p.vx+.48,max);p.face=1}if(!L&&!Rt)p.vx*=.78;
  if(J&&p.on&&!jumpHeld){if(p.crouch&&canStand()){setH(62);p.crouch=false}p.vy=-17.6;p.on=false}
  // Glide is player-only: after jumping, hold A while descending.
- p.glide=(!p.blueHorn&&!p.on&&J&&p.vy>0);
+ p.glide=(!p.on&&J&&p.vy>0);
  jumpHeld=!!J;
  p.vy=Math.min(p.vy+.58,14);
- if(p.glide&&p.vy>2.15)p.vy=2.15;
-
- /*BLUE_AIR_HOP_V24*/
- let _airJumpNow=!!J;
- if(p.blueHorn&&!p.on&&_airJumpNow&&!p._airJumpPrev){p.vy=-8.0;p.glide=false;}
- p._airJumpPrev=_airJumpNow;
-
- if(keys.punch){
+ if(p.glide){if(p.blueHorn)p.vy=0;else if(p.vy>2.15)p.vy=2.15;}
+if(keys.punch){
    if(p.glove&&!p.blueHorn&&p.punchCd<=0){p.attackUp=!!U;p.punchT=10;p.punchCd=17}
    else if((!p.glove||p.blueHorn)&&p.hornCd<=0){p.attackUp=!!U;p.hornT=18;p.hornCd=27;if(p.attackUp&&p.on){p.vy=-2.7;p.on=false}}
  }
