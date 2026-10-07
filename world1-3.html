@@ -201,8 +201,7 @@ if(LOOP2&&typeof ladybugs!=='undefined'&&Array.isArray(ladybugs)&&typeof thrower
 }
 function update(){/*LOOP2_BLUE_PERMANENT*/if(LOOP2&&!p.blueHorn)p.blueHorn=true;/*BLUE_AIR_HOP*/
  let _aNow=!!keys.a;
- if(p.on){p._blueAirHopUsed=0;}
- if(p.blueHorn&&!p.on&&_aNow&&!p._aPrev&&!p._blueAirHopUsed){p.vy=-6.2;p._blueAirHopUsed=1;}
+ if(p.blueHorn&&!p.on&&_aNow&&!p._aPrev){p.vy=-6.2;}
  p._aPrev=_aNow;
 /*LOOP2_DIFFICULTY*/if(LOOP2&&!window.__loop2Tuned){window.__loop2Tuned=1;for(let name of ['enemies','grasshoppers','snails','frogs','throwers']){let a=window[name];if(Array.isArray(a))for(let e of a){if(typeof e.vx==='number')e.vx*=1.12;if(typeof e.speed==='number')e.speed*=1.12}}}/*NO_GENERIC_LOOP_BULLETS*/if(typeof loopBullets!=='undefined')loopBullets.length=0;
  frame++;if(won){winTimer++;if(winTimer===55)nextStage('world1-4.html');return;}
