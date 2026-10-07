@@ -175,12 +175,10 @@ if(LOOP2&&typeof ladybugs!=='undefined'&&Array.isArray(ladybugs)&&typeof thrower
  ladybugs.length=0;
 }
 function update(){/*LOOP2_BLUE_PERMANENT*/if(LOOP2&&!p.blueHorn)p.blueHorn=true;/*BLUE_AIR_HOP*/
- let _aHopKey=!!keys.a;
- if(p.on){p._blueAirHopUsed=0;p._blueAirHopLatch=_aHopKey;}
- else{
-  if(!_aHopKey)p._blueAirHopLatch=0;
-  if(p.blueHorn&&_aHopKey&&!p._blueAirHopLatch&&!p._blueAirHopUsed){p.vy=-4.6;p._blueAirHopUsed=1;p._blueAirHopLatch=1;}
- }
+ let _aNow=!!keys.a;
+ if(p.on){p._blueAirHopUsed=0;}
+ if(p.blueHorn&&!p.on&&_aNow&&!p._aPrev&&!p._blueAirHopUsed){p.vy=-6.2;p._blueAirHopUsed=1;}
+ p._aPrev=_aNow;
 /*LOOP2_DIFFICULTY*/if(LOOP2&&!window.__loop2Tuned){window.__loop2Tuned=1;for(let name of ['enemies','grasshoppers','snails','frogs','throwers']){let a=window[name];if(Array.isArray(a))for(let e of a){if(typeof e.vx==='number')e.vx*=1.12;if(typeof e.speed==='number')e.speed*=1.12}}}/*NO_GENERIC_LOOP_BULLETS*/if(typeof loopBullets!=='undefined')loopBullets.length=0;
  frame++;if(won)return;
  if(p.inv)p.inv--;if(noticeT)noticeT--;if(p.punchT)p.punchT--;if(p.punchCd)p.punchCd--;if(p.hornT)p.hornT--;if(p.hornCd)p.hornCd--;p.anim+=Math.abs(p.vx)*.16;
@@ -351,13 +349,7 @@ function update(){/*LOOP2_BLUE_PERMANENT*/if(LOOP2&&!p.blueHorn)p.blueHorn=true;
  for(let d of particles){d.x+=d.vx;d.y+=d.vy;d.vy+=.35;d.t--}particles=particles.filter(d=>d.t>0);
 
  if(p.y>650)hurt();
- if(!stageExit&&p.x>5660){stageExit=1;score+=1000;p.inv=9999}
- if(stageExit){
-   // After reaching the goal tree, control is taken briefly: walk into the exit pipe and descend to WORLD 1-2.
-   keys={};p.face=1;p.crouch=false;
-   if(stageExit===1){p.vx=3.2;if(p.x>=5742){p.x=5742;p.vx=0;stageExit=2}}
-   else if(stageExit===2){p.vx=0;p.y+=2.8;if(p.y>GROUND+72){localStorage.setItem('maruchibiScore',String(score));localStorage.setItem('maruchibiStars',String(stars));localStorage.setItem('maruchibiBig',p.big?'1':'0');localStorage.setItem('maruchibiGlove',p.glove?'1':'0');localStorage.setItem('maruchibiBlueHorn',p.blueHorn?'1':'0');location.href='world1-2.html'}}
- }
+ if(!stageExit&&p.x>5660){stageExit=1;score+=1000;nextStage('world1-2.html');}
  cam=Math.max(0,Math.min(WORLD-W,p.x-300));
 }
 
